@@ -1,6 +1,6 @@
 package com.srpafb.dao;
 
-import com.srpafb.database.DatabaseConnection;
+import com.srpafb.connection.MySQLConnection;
 import com.srpafb.model.Categoria;
 
 import java.sql.*;
@@ -12,7 +12,7 @@ public class CategoriaDAO {
     public void insertar(Categoria c) {
         String sql = "INSERT INTO categoria (nombre) VALUES (?)";
 
-        try (Connection con = Connection.getConnection();
+        try (Connection con = MySQLConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, c.getNombre());
@@ -27,7 +27,7 @@ public class CategoriaDAO {
         List<Categoria> lista = new ArrayList<>();
         String sql = "SELECT id, nombre FROM categoria";
 
-        try (Connection con = Connection.getConnection();
+        try (Connection con = MySQLConnection.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -49,7 +49,7 @@ public class CategoriaDAO {
     public Categoria obtenerPorId(int id) {
         String sql = "SELECT id, nombre FROM categoria WHERE id = ?";
 
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = MySQLConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);

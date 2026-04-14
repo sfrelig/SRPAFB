@@ -1,14 +1,14 @@
-package view;
+package com.srpafb.view;
 
-import dao.personaDAO;
-import model.Persona;
+import com.srpafb.dao.PersonaDAO;
+import com.srpafb.model.Persona;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class personaForm extends JFrame {
+public class PersonaForm extends JFrame {
 
-    public personaForm() {
+    public PersonaForm() {
         setTitle("Registrar Persona");
         setSize(350, 300);
         setLayout(new GridLayout(6, 2));
@@ -40,10 +40,10 @@ public class personaForm extends JFrame {
             p.setNombre(txtNombre.getText());
             p.setApellido(txtApellido.getText());
             p.setDni(txtDni.getText());
-            p.setFechaNac(java.sql.Date.valueOf(txtFecha.getText()));
+            p.setFechaNacimiento(java.time.LocalDate.parse(txtFecha.getText()));
             p.setCategoriaId(Integer.parseInt(txtCategoria.getText()));
 
-            new personaDAO().insertar(p);
+            new PersonaDAO().insertar(p);
             JOptionPane.showMessageDialog(null, "Persona registrada");
         });
 

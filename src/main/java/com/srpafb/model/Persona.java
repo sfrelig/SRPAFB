@@ -2,8 +2,11 @@ package com.srpafb.model;
 
 import java.time.LocalDate;
 
+
+
 public class Persona {
     private int id;
+    private int categoriaId;
     private String nombre;
     private String apellido;
     private String dni;
@@ -37,6 +40,19 @@ public class Persona {
     public LocalDate getFechaNacimiento() { return fechaNacimiento; }
     public void setFechaNacimiento(LocalDate fechaNacimiento) { this.fechaNacimiento = fechaNacimiento; }
 
+    public int getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(int categoriaId) {
+        this.categoriaId = categoriaId;
+    }
+
     public Categoria getCategoria() { return categoria; }
     public void setCategoria(Categoria categoria) { this.categoria = categoria; }
+
+    @Override
+    public String toString() {
+    return nombre + " " + apellido;
+    }
 }

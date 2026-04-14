@@ -1,7 +1,7 @@
-package dao;
+package com.srpafb.dao;
 
-import connection.MySQLConnection;
-import model.Prueba;
+import com.srpafb.connection.MySQLConnection;
+import com.srpafb.model.Prueba;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -12,38 +12,62 @@ public class PruebaDAO {
     public void insertar(Prueba p) {
         String sql = "INSERT INTO prueba (nombre, unidad) VALUES (?, ?)";
 
-        try (Connection conn = MySQLConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection con = MySQLConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            stmt.setString(1, p.getNombre());
-            stmt.setString(2, p.getUnidad());
-            stmt.executeUpdate();
+            ps.setString(1, p.getNombre());
+            ps.setString(2, p.getUnidad());
+            ps.executeUpdate();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error insertando prueba", e);
         }
     }
 
-    public List<Prueba> listar() {
+    public List<Prueba> obtenerTodas() {
         List<Prueba> lista = new ArrayList<>();
         String sql = "SELECT * FROM prueba";
 
-        try (Connection conn = MySQLConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection con = MySQLConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
-                Prueba p = new Prueba(
+                lista.add(new Prueba(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getString("unidad")
+                ));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo pruebas", e);
+        }
+
+        return lista;
+    }
+
+    public Prueba obtenerPorId(int id) {
+        String sql = "SELECT * FROM prueba WHERE id = ?";
+
+        try (Connection con = MySQLConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Prueba(
                         rs.getInt("id"),
                         rs.getString("nombre"),
                         rs.getString("unidad")
                 );
-                lista.add(p);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo prueba por ID", e);
         }
-        return lista;
+
+        return null;
     }
 }

@@ -1,11 +1,11 @@
-package view;
+package com.srpafb.view;
 
 import javax.swing.*;
 
 public class MenuPrincipal extends JFrame {
 
     public MenuPrincipal() {
-        setTitle("SIGAEF - Sistema de Gestión de Pruebas Físicas");
+        setTitle("SRPAFB - Sistema de Registro de Pruebas de Aptitud Física Basica");
         setSize(400, 300);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -19,9 +19,9 @@ public class MenuPrincipal extends JFrame {
         panel.add(btnPruebas);
         panel.add(btnResultados);
 
-        btnPersonas.addActionListener(e -> new personaForm());
-        btnPruebas.addActionListener(e -> new pruebaForm());
-        btnResultados.addActionListener(e -> new resultadoForm());
+        btnPersonas.addActionListener(e -> new PersonaForm());
+        btnPruebas.addActionListener(e -> new PruebaForm());
+        btnResultados.addActionListener(e -> new ResultadoForm());
 
         add(panel);
         setVisible(true);

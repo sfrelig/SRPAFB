@@ -1,52 +1,88 @@
-package view;
+package com.srpafb.view;
 
-import dao.ResultadoDAO;
-import model.Resultado;
+import com.srpafb.dao.*;
+import com.srpafb.model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
+import java.util.List;
 
-public class resultadoForm extends JFrame {
+public class ResultadoForm extends JFrame {
 
-    public resultadoForm() {
-        setTitle("Cargar Resultado");
-        setSize(300, 250);
+    private JComboBox<Persona> comboPersona;
+    private JComboBox<Prueba> comboPrueba;
+    private JTextField txtValor;
+    private JTextField txtFecha;
+
+    public ResultadoForm() {
+
+        setTitle("Registro de Resultados PAFB");
+        setSize(400, 300);
         setLayout(new GridLayout(5, 2));
         setLocationRelativeTo(null);
 
-        JTextField txtPersona = new JTextField();
-        JTextField txtPrueba = new JTextField();
-        JTextField txtValor = new JTextField();
-        JTextField txtAnio = new JTextField();
+        comboPersona = new JComboBox<>();
+        comboPrueba = new JComboBox<>();
+        txtValor = new JTextField();
+        txtFecha = new JTextField();
 
-        JButton btnGuardar = new JButton("Guardar");
+        cargarPersonas();
+        cargarPruebas();
 
-        add(new JLabel("ID Persona:"));
-        add(txtPersona);
-        add(new JLabel("ID Prueba:"));
-        add(txtPrueba);
+        add(new JLabel("Persona:"));
+        add(comboPersona);
+
+        add(new JLabel("Prueba:"));
+        add(comboPrueba);
+
         add(new JLabel("Valor:"));
         add(txtValor);
-        add(new JLabel("Año:"));
-        add(txtAnio);
 
+        add(new JLabel("Fecha (YYYY-MM-DD):"));
+        add(txtFecha);
+
+        JButton btnGuardar = new JButton("Guardar");
         add(btnGuardar);
 
-        btnGuardar.addActionListener(e -> {
-            Resultado r = new Resultado();
-            persona p = new persona();
-            p.setId(Integer.parseInt(txtPersona.getText()));
+        btnGuardar.addActionListener(e -> guardar());
 
-            r.setPersona(p);
-            r.setPruebaId(Integer.parseInt(txtPrueba.getText()));
+        setVisible(true);
+    }
+
+    private void cargarPersonas() {
+        PersonaDAO dao = new PersonaDAO();
+        List<Persona> lista = dao.obtenerTodas();
+
+        for (Persona p : lista) {
+            comboPersona.addItem(p);
+        }
+    }
+
+    private void cargarPruebas() {
+        PruebaDAO dao = new PruebaDAO();
+        List<Prueba> lista = dao.obtenerTodas();
+
+        for (Prueba p : lista) {
+            comboPrueba.addItem(p);
+        }
+    }
+
+    private void guardar() {
+        try {
+            Resultado r = new Resultado();
+
+            r.setPersona((Persona) comboPersona.getSelectedItem());
+            r.setPrueba((Prueba) comboPrueba.getSelectedItem());
             r.setValor(Double.parseDouble(txtValor.getText()));
-            r.setAño(Integer.parseInt(txtAnio.getText()));
+            r.setFecha(LocalDate.parse(txtFecha.getText()));
 
             new ResultadoDAO().insertar(r);
 
-            JOptionPane.showMessageDialog(null, "Resultado cargado");
-        });
+            JOptionPane.showMessageDialog(this, "Resultado guardado");
 
-        setVisible(true);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+        }
     }
 }

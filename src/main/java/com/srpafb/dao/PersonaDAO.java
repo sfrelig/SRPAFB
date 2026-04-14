@@ -15,7 +15,7 @@ public class PersonaDAO {
     public void insertar(Persona p) {
         String sql = "INSERT INTO persona (nombre, apellido, dni, fecha_nacimiento, categoria_id) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = MySQLConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, p.getNombre());
@@ -35,7 +35,7 @@ public class PersonaDAO {
         List<Persona> lista = new ArrayList<>();
         String sql = "SELECT * FROM persona";
 
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = MySQLConnection.getConnection();
              Statement st = con.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
 
@@ -64,7 +64,7 @@ public class PersonaDAO {
     public Persona obtenerPorId(int id) {
         String sql = "SELECT * FROM persona WHERE id = ?";
 
-        try (Connection con = DatabaseConnection.getConnection();
+        try (Connection con = MySQLConnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, id);
@@ -88,4 +88,4 @@ public class PersonaDAO {
 
         return null;
     }
-}}
+}

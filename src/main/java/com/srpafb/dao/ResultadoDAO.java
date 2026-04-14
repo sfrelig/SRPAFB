@@ -1,55 +1,65 @@
-package dao;
+package com.srpafb.dao;
 
-import connection.MySQLConnection;
-import model.Resultado;
+import com.srpafb.connection.MySQLConnection;
+import com.srpafb.model.Persona;
+import com.srpafb.model.Prueba;
+import com.srpafb.model.Resultado;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResultadoDAO {
 
+    private final PersonaDAO personaDAO = new PersonaDAO();
+    private final PruebaDAO pruebaDAO = new PruebaDAO();
+
     public void insertar(Resultado r) {
-        String sql = "INSERT INTO resultado (persona_id, prueba_id, valor, año) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO resultado (persona_id, prueba_id, fecha, valor) VALUES (?, ?, ?, ?)";
 
-        try (Connection conn = MySQLConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection con = MySQLConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
-            stmt.setInt(1, r.getPersona().getId());
-            stmt.setInt(2, r.getPrueba().getId());
-            stmt.setDouble(3, r.getValor());
-            stmt.setInt(4, r.getAño());
-            stmt.executeUpdate();
+            ps.setInt(1, r.getPersona().getId());
+            ps.setInt(2, r.getPrueba().getId());
+            ps.setDate(3, Date.valueOf(r.getFecha()));
+            ps.setDouble(4, r.getValor());
 
-        } catch (Exception e) {
-            e.printStackTrace();
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error insertando resultado", e);
         }
     }
 
-    public List<Resultado> listarPorPersona(int idPersona) {
+    public List<Resultado> obtenerTodos() {
         List<Resultado> lista = new ArrayList<>();
-        String sql = "SELECT * FROM resultado WHERE persona_id = ?";
+        String sql = "SELECT * FROM resultado";
 
-        try (Connection conn = MySQLConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, idPersona);
-            ResultSet rs = stmt.executeQuery();
+        try (Connection con = MySQLConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
 
             while (rs.next()) {
+                Persona p = personaDAO.obtenerPorId(rs.getInt("persona_id"));
+                Prueba pr = pruebaDAO.obtenerPorId(rs.getInt("prueba_id"));
+
                 Resultado r = new Resultado(
                         rs.getInt("id"),
-                        rs.getInt("persona_id"),
-                        rs.getInt("prueba_id"),
-                        rs.getDouble("valor"),
-                        rs.getInt("año")
+                        p,
+                        pr,
+                        rs.getDate("fecha").toLocalDate(),
+                        rs.getDouble("valor")
                 );
+
                 lista.add(r);
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo resultados", e);
         }
+
         return lista;
     }
 }

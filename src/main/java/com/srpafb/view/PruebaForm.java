@@ -1,14 +1,14 @@
-package view;
+package com.srpafb.view;
 
-import dao.PruebaDAO;
-import model.Prueba;
+import com.srpafb.dao.PruebaDAO;
+import com.srpafb.model.Prueba;
 
 import javax.swing.*;
 import java.awt.*;
 
-public class pruebaForm extends JFrame {
+public class PruebaForm extends JFrame {
 
-    public pruebaForm() {
+    public PruebaForm() {
         setTitle("Registrar Prueba");
         setSize(300, 200);
         setLayout(new GridLayout(3, 2));
