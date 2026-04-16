@@ -18,4 +18,9 @@ Este sistema forma parte del trabajo práctico integrador del **Seminario de Pr�
 
 ## 🏗 Arquitectura del Sistema
 El proyecto está organizado en capas:
-
+com.srpafb
+├── model → Entidades del dominio
+├── dao → Acceso a datos con MySQL
+├── service → Lógica de negocio (baremos y validaciones)
+├── view → Interfaz Swing para carga de datos
+└── app → Clase Main
