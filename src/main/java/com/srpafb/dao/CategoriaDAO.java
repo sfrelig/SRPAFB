@@ -46,6 +46,58 @@ public class CategoriaDAO {
         return lista;
     }
 
+    public Categoria obtenerPorNombre(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return null;
+        }
+
+        String sql = "SELECT id, nombre FROM categoria WHERE LOWER(nombre) = LOWER(?)";
+
+        try (Connection con = MySQLConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, nombre.trim());
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Categoria(rs.getInt("id"), rs.getString("nombre"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo categoría por nombre", e);
+        }
+
+        return null;
+    }
+
+    public Categoria insertarSiNoExiste(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return null;
+        }
+
+        Categoria categoria = obtenerPorNombre(nombre);
+        if (categoria != null) {
+            return categoria;
+        }
+
+        String sql = "INSERT INTO categoria (nombre) VALUES (?)";
+
+        try (Connection con = MySQLConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            ps.setString(1, nombre.trim());
+            ps.executeUpdate();
+            try (ResultSet keys = ps.getGeneratedKeys()) {
+                if (keys.next()) {
+                    return new Categoria(keys.getInt(1), nombre.trim());
+                }
+            }
+            return obtenerPorNombre(nombre);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error insertando categoría", e);
+        }
+    }
+
     public Categoria obtenerPorId(int id) {
         String sql = "SELECT id, nombre FROM categoria WHERE id = ?";
 

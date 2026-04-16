@@ -1,5 +1,6 @@
 package com.srpafb.model;
 
+import com.srpafb.service.PuntajeService;
 import java.time.LocalDate;
 
 public class Resultado {
@@ -32,5 +33,14 @@ public class Resultado {
     public void setFecha(LocalDate fecha) { this.fecha = fecha; }
 
     public double getValor() { return valor; }
+
+    public double getPuntaje() {
+        return calcularPuntaje(prueba, persona, valor);
+    }
+
     public void setValor(double valor) { this.valor = valor; }
+
+    public static double calcularPuntaje(Prueba prueba, Persona persona, double valor) {
+        return PuntajeService.getInstance().obtenerPuntaje(prueba, persona, valor);
+    }
 }
