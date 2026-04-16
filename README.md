@@ -24,3 +24,59 @@ com.srpafb
 ├── service → Lógica de negocio (baremos y validaciones)
 ├── view → Interfaz Swing para carga de datos
 └── app → Clase Main
+
+---
+
+## 💾 Base de Datos
+El script necesario se encuentra en:
+db/srpafb.sql
+
+Incluye:
+- creación de base `srpafb`
+- tablas: persona, categoria, prueba, resultado, baremo
+- claves foráneas
+- inserts básicos
+
+---
+
+## 🧪 Funcionalidades Implementadas
+- Registro de personas (con categoría y fecha de nacimiento)
+- Registro de pruebas físicas
+- Carga de resultados anuales
+- Cálculo automático de puntaje según baremo (prueba/género)
+- Importación desde archivo Excel (futuro módulo)
+- Interfaz Swing operativa para carga de datos
+
+---
+
+## 📊 Documentación
+En `/docs` se encuentran:
+
+- Informe académico completo (PDF)
+- Diagramas UML:
+  - Diagrama de Clases
+  - Diagrama de Secuencia – Carga de Resultado
+- Presentación breve para exposición oral
+
+---
+
+## ▶️ Ejecución del Proyecto
+1. Clonar el repositorio  
+2. Importar el proyecto como **Maven Project** en IntelliJ  
+3. Crear base de datos ejecutando `db/srpafb.sql`  
+4. Configurar credenciales en `MySQLConnection.java`  
+5. Ejecutar `com.srpafb.app.Main`
+
+---
+
+## 👨‍💻 Autor
+**Sergio G. Frelig**  
+Legajo **VINF09693**  
+Seminario de Práctica de Informática – Módulo 1  
+Profesora: **Ana Carolina Ferreyra**  
+Universidad Siglo 21
+
+---
+
+## 📄 Licencia
+Proyecto académico – uso educativo.
