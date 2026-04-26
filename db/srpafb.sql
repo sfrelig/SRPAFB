@@ -10,8 +10,12 @@ CREATE TABLE persona (
    id INT AUTO_INCREMENT PRIMARY KEY,
    nombre VARCHAR(50),
    apellido VARCHAR(50),
+   grado VARCHAR(50),
    dni VARCHAR(20),
    fecha_nac DATE,
+   sexo ENUM('M','F'),
+   peso DOUBLE,
+   talla DOUBLE,
    categoria_id INT,
    FOREIGN KEY (categoria_id) REFERENCES categoria(id)
 );
@@ -36,9 +40,11 @@ CREATE TABLE resultado (
 CREATE TABLE baremo (
    id INT AUTO_INCREMENT PRIMARY KEY,
    prueba_id INT,
+   categoria_id INT,
    genero ENUM('M','F'),
    valor_min DOUBLE,
    valor_max DOUBLE,
    puntaje INT,
-   FOREIGN KEY (prueba_id) REFERENCES prueba(id)
+   FOREIGN KEY (prueba_id) REFERENCES prueba(id),
+   FOREIGN KEY (categoria_id) REFERENCES categoria(id)
 );

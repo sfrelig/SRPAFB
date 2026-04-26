@@ -109,8 +109,12 @@ public class ResultadosView extends JFrame {
 
         JButton btnExportar = new JButton("Exportar a PDF");
         JButton btnRefrescar = new JButton("Refrescar");
+        JButton btnEditar = new JButton("Editar resultado");
+        JButton btnEliminar = new JButton("Eliminar resultado");
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.add(btnRefrescar);
+        buttonPanel.add(btnEditar);
+        buttonPanel.add(btnEliminar);
         buttonPanel.add(btnExportar);
 
         root.add(topPanel, BorderLayout.NORTH);
@@ -121,6 +125,8 @@ public class ResultadosView extends JFrame {
         btnReset.addActionListener(e -> resetearFiltros());
         btnRefrescar.addActionListener(e -> cargarResultados());
         btnExportar.addActionListener(e -> exportarInformePDF());
+        btnEditar.addActionListener(e -> editarResultadoSeleccionado());
+        btnEliminar.addActionListener(e -> eliminarResultadoSeleccionado());
 
         add(root);
         cargarResultados();
@@ -165,7 +171,7 @@ public class ResultadosView extends JFrame {
                     r.getPrueba() != null ? r.getPrueba().toString() : "-",
                     formatearValor(r),
                     String.format("%.2f", r.getPuntaje()),
-                    r.getFecha().format(DateTimeFormatter.ISO_LOCAL_DATE)
+                    r.getFecha().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
             });
         }
 
@@ -270,6 +276,41 @@ public class ResultadosView extends JFrame {
             return 0.0;
         }
         return resultadosFiltrados.stream().mapToDouble(Resultado::getPuntaje).average().orElse(0.0);
+    }
+
+    private void editarResultadoSeleccionado() {
+        int fila = table.getSelectedRow();
+        if (fila < 0) {
+            JOptionPane.showMessageDialog(this, "Seleccione un resultado para editar.", "Editar", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int id = Integer.parseInt(table.getValueAt(fila, 0).toString());
+        Resultado resultado = resultadoDAO.obtenerPorId(id);
+        if (resultado == null) {
+            JOptionPane.showMessageDialog(this, "No se encontró el resultado seleccionado.", "Editar", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        new ResultadoEditForm(this, resultado, this::cargarResultados);
+    }
+
+    private void eliminarResultadoSeleccionado() {
+        int fila = table.getSelectedRow();
+        if (fila < 0) {
+            JOptionPane.showMessageDialog(this, "Seleccione un resultado para eliminar.", "Eliminar", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        int id = Integer.parseInt(table.getValueAt(fila, 0).toString());
+        int confirm = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar este resultado?", "Eliminar", JOptionPane.YES_NO_OPTION);
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+        try {
+            resultadoDAO.eliminar(id);
+            cargarResultados();
+            JOptionPane.showMessageDialog(this, "Resultado eliminado correctamente.", "Eliminar", JOptionPane.INFORMATION_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "No se pudo eliminar el resultado: " + ex.getMessage(), "Eliminar", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void exportarInformePDF() {

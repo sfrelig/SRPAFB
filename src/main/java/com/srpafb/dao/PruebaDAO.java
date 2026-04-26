@@ -70,4 +70,41 @@ public class PruebaDAO {
 
         return null;
     }
+
+    public Prueba obtenerPorNombre(String nombre) {
+        String sql = "SELECT * FROM prueba WHERE nombre = ?";
+
+        try (Connection con = MySQLConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, nombre);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return new Prueba(
+                        rs.getInt("id"),
+                        rs.getString("nombre"),
+                        rs.getString("unidad")
+                );
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error obteniendo prueba por nombre", e);
+        }
+
+        return null;
+    }
+
+    public Prueba insertarSiNoExiste(String nombre, String unidad) {
+        Prueba existente = obtenerPorNombre(nombre);
+        if (existente != null) {
+            return existente;
+        }
+
+        Prueba prueba = new Prueba();
+        prueba.setNombre(nombre);
+        prueba.setUnidad(unidad);
+        insertar(prueba);
+        return obtenerPorNombre(nombre);
+    }
 }

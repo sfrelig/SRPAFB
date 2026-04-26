@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS auditoria (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    entidad VARCHAR(100) NOT NULL,
+    entidad_id INT NOT NULL,
+    operacion VARCHAR(50) NOT NULL,
+    detalle TEXT,
+    usuario VARCHAR(100) NOT NULL,
+    fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

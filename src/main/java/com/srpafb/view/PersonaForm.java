@@ -2,17 +2,16 @@ package com.srpafb.view;
 
 import com.srpafb.dao.CategoriaDAO;
 import com.srpafb.dao.PersonaDAO;
-import com.srpafb.dao.SexoDAO;
 import com.srpafb.model.Categoria;
 import com.srpafb.model.Persona;
+import com.srpafb.exception.AppException;
+import com.srpafb.exception.ExceptionHandler;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.ArrayList;
 
 public class PersonaForm extends JFrame {
 
@@ -32,8 +31,7 @@ public class PersonaForm extends JFrame {
         JTextField txtApellido = new JTextField();
         JTextField txtGrado = new JTextField();
         JTextField txtDni = new JTextField();
-        JTextField txtFecha = new JTextField();
-        txtFecha.setToolTipText("Formato: YYYY-MM-DD");
+        DatePicker datePicker = new DatePicker();
         JTextField txtPeso = new JTextField();
         JTextField txtTalla = new JTextField();
         JLabel lblImc = new JLabel("-");
@@ -42,16 +40,9 @@ public class PersonaForm extends JFrame {
         JComboBox<String> comboSexo = new JComboBox<>();
         comboSexo.setToolTipText("Seleccione el sexo de la persona.");
 
-        List<String> sexos = new SexoDAO().obtenerTodos();
-        if (sexos.isEmpty()) {
-            sexos = new ArrayList<>();
-            sexos.add("Masculino");
-            sexos.add("Femenino");
-            sexos.add("Otro");
-        }
-        for (String sexo : sexos) {
-            comboSexo.addItem(sexo);
-        }
+        // Usar directamente los valores del ENUM de la base de datos
+        comboSexo.addItem("M");
+        comboSexo.addItem("F");
 
         addLabel(panel, "Nombre:", 0, gbc);
         addField(panel, txtNombre, 0, gbc);
@@ -63,8 +54,8 @@ public class PersonaForm extends JFrame {
         addField(panel, txtDni, 3, gbc);
         addLabel(panel, "Sexo:", 4, gbc);
         addField(panel, comboSexo, 4, gbc);
-        addLabel(panel, "Fecha Nac (YYYY-MM-DD):", 5, gbc);
-        addField(panel, txtFecha, 5, gbc);
+        addLabel(panel, "Fecha Nac:", 5, gbc);
+        addField(panel, datePicker, 5, gbc);
         addLabel(panel, "Peso (kg):", 6, gbc);
         addField(panel, txtPeso, 6, gbc);
         addLabel(panel, "Talla (m):", 7, gbc);
@@ -90,21 +81,21 @@ public class PersonaForm extends JFrame {
         DocumentListener calculoListener = new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                actualizarCalculos(txtFecha, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria);
+                actualizarCalculos(datePicker, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                actualizarCalculos(txtFecha, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria);
+                actualizarCalculos(datePicker, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria);
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                actualizarCalculos(txtFecha, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria);
+                actualizarCalculos(datePicker, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria);
             }
         };
 
-        txtFecha.getDocument().addDocumentListener(calculoListener);
+        datePicker.addDateChangeListener(() -> actualizarCalculos(datePicker, txtPeso, txtTalla, lblEdad, lblImc, lblCategoria));
         txtPeso.getDocument().addDocumentListener(calculoListener);
         txtTalla.getDocument().addDocumentListener(calculoListener);
 
@@ -114,7 +105,6 @@ public class PersonaForm extends JFrame {
                 validarTexto(txtApellido.getText(), "Apellido");
                 validarTexto(txtGrado.getText(), "Grado");
                 validarTexto(txtDni.getText(), "DNI");
-                validarTexto(txtFecha.getText(), "Fecha de nacimiento");
                 validarTexto(txtPeso.getText(), "Peso");
                 validarTexto(txtTalla.getText(), "Talla");
 
@@ -124,7 +114,10 @@ public class PersonaForm extends JFrame {
                     throw new IllegalArgumentException("Ya existe una persona con ese DNI.");
                 }
 
-                LocalDate fechaNacimiento = LocalDate.parse(txtFecha.getText().trim());
+                LocalDate fechaNacimiento = datePicker.getDate();
+                if (fechaNacimiento == null) {
+                    throw new IllegalArgumentException("Seleccione la fecha de nacimiento.");
+                }
                 int edad = Persona.calcularEdad(fechaNacimiento);
                 if (edad <= 0) {
                     throw new IllegalArgumentException("La fecha de nacimiento no es válida.");
@@ -175,7 +168,7 @@ public class PersonaForm extends JFrame {
             txtApellido.setText("");
             txtGrado.setText("");
             txtDni.setText("");
-            txtFecha.setText("");
+            datePicker.setDate(LocalDate.now());
             txtPeso.setText("");
             txtTalla.setText("");
             comboSexo.setSelectedIndex(0);
@@ -203,10 +196,10 @@ public class PersonaForm extends JFrame {
         panel.add(field, gbc);
     }
 
-    private void actualizarCalculos(JTextField txtFecha, JTextField txtPeso, JTextField txtTalla,
+    private void actualizarCalculos(DatePicker datePicker, JTextField txtPeso, JTextField txtTalla,
                                     JLabel lblEdad, JLabel lblImc, JLabel lblCategoria) {
         try {
-            LocalDate fechaNacimiento = LocalDate.parse(txtFecha.getText().trim());
+            LocalDate fechaNacimiento = datePicker.getDate();
             int edad = Persona.calcularEdad(fechaNacimiento);
             lblEdad.setText(String.valueOf(edad));
             double peso = Double.parseDouble(txtPeso.getText().trim().replace(',', '.'));
